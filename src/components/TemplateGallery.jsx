@@ -52,7 +52,7 @@ function TemplateCard({ template, onUse }) {
   );
 }
 
-export default function TemplateGallery() {
+export default function TemplateGallery({ onUse }) {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState('All');
 
@@ -62,14 +62,6 @@ export default function TemplateGallery() {
       t.name.toLowerCase().includes(query.toLowerCase())
     );
   }, [query, active]);
-
-  const onUse = (tpl) => {
-    const params = new URLSearchParams({ template: String(tpl.id), name: tpl.name });
-    window.location.hash = `customize-${tpl.id}`;
-    alert(`Loaded template: ${tpl.name}. Next, tweak styles below!`);
-    // In a full app, this would initialize the builder state with the chosen template.
-    history.replaceState(null, '', `#${params.toString()}`);
-  };
 
   return (
     <section id="templates" className="relative py-20 bg-white">

@@ -1,11 +1,23 @@
-import React, { useMemo, useState } from 'react';
-import { Palette, Type, LayoutGrid, Link as LinkIcon } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Palette, Type, LayoutGrid, Link as LinkIcon, Sparkles } from 'lucide-react';
 
 const COLORS = ['#0ea5e9', '#22c55e', '#f97316', '#ef4444', '#8b5cf6', '#14b8a6', '#111827'];
 const FONTS = ['Inter', 'Geist', 'Manrope', 'IBM Plex Sans', 'Mona Sans'];
 const LAYOUTS = ['Classic', 'Split', 'Masonry'];
 
-function PreviewCard({ color, font, layout }) {
+function templateDefaults(template) {
+  if (!template) return null;
+  // Derive a consistent style set from template id/category so it feels purposeful
+  const idx = template.id % COLORS.length;
+  const color = COLORS[idx];
+  const font = FONTS[template.id % FONTS.length];
+  let layout = 'Classic';
+  if (template.category === 'Designer' || template.category === 'Photographer') layout = 'Masonry';
+  if (template.category === 'Developer' || template.category === 'Minimal') layout = 'Split';
+  return { color, font, layout };
+}
+
+function PreviewCard({ color, font, layout, badge }) {
   const blocks = useMemo(() => {
     switch (layout) {
       case 'Split':
@@ -27,6 +39,11 @@ function PreviewCard({ color, font, layout }) {
         </div>
         <div className="text-xs text-slate-500">Live preview</div>
       </div>
+      {badge && (
+        <div className="mb-3 inline-flex items-center gap-2 text-xs font-medium bg-slate-100 text-slate-700 rounded-full px-3 py-1">
+          <Sparkles className="w-3 h-3" /> Loaded {badge}
+        </div>
+      )}
       <div className={`${blocks}`} style={{ fontFamily: font }}>
         <div className="rounded-lg bg-slate-100 h-24" />
         <div className="rounded-lg bg-slate-100 h-14" />
@@ -39,17 +56,36 @@ function PreviewCard({ color, font, layout }) {
   );
 }
 
-export default function CustomizerPanel() {
+export default function CustomizerPanel({ selectedTemplate }) {
   const [color, setColor] = useState(COLORS[0]);
   const [font, setFont] = useState(FONTS[0]);
   const [layout, setLayout] = useState(LAYOUTS[0]);
   const [links, setLinks] = useState({ github: 'https://github.com/you', twitter: 'https://x.com/you' });
+  const [loadedBadge, setLoadedBadge] = useState('');
+
+  useEffect(() => {
+    if (!selectedTemplate) return;
+    const next = templateDefaults(selectedTemplate);
+    if (next) {
+      setColor(next.color);
+      setFont(next.font);
+      setLayout(next.layout);
+      setLoadedBadge(`${selectedTemplate.name}`);
+    }
+  }, [selectedTemplate]);
 
   return (
     <section id="customize" className="relative py-20 bg-slate-50">
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
         <div className="space-y-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Make it yours</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Make it yours</h2>
+            {selectedTemplate && (
+              <span className="inline-flex items-center gap-2 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1">
+                <Sparkles className="w-4 h-4" /> Using {selectedTemplate.name}
+              </span>
+            )}
+          </div>
           <p className="text-slate-600">Fine-tune colors, typography, layout, and social links. Your changes render instantly.</p>
 
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-6">
@@ -115,7 +151,7 @@ export default function CustomizerPanel() {
           </div>
         </div>
 
-        <PreviewCard color={color} font={font} layout={layout} />
+        <PreviewCard color={color} font={font} layout={layout} badge={loadedBadge} />
       </div>
     </section>
   );
