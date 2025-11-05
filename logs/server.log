@@ -2,8 +2,8 @@
 > vibe-generated-app@1.0.0 dev
 > vite
 
-error when starting dev server:
-Error: Port 3000 is already in use
-    at Server.onError (file:///home/workspace/n11:45:18 AM [vite] ✨ new dependencies optimized: @splinetool/react-spline, lucide-react
-11:45:18 AM [vite] ✨ optimized dependencies changed. reloading
-cessTicksAndRejections (node:internal/process/task_queues:90:21)
+
+  VITE v5.4.20  ready in 296 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://172.20.3.50:3000/
